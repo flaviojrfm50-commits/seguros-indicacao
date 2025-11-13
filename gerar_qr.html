@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Gerar QR de Indicação</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+<style>
+  body { font-family: Arial; max-width: 700px; margin: 40px auto; text-align: center; }
+  input { width: 90%; padding: 10px; margin: 8px 0; }
+  button { padding: 10px 20px; background: #25D366; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+  #qrcode { margin-top: 20px; }
+  a { display:block; margin-top:10px; }
+</style>
+</head>
+<body>
+  <h2>Gerar QR para Indicação</h2>
+  <input id="partner" placeholder="Nome do parceiro (ex: Mecânica do João)" />
+  <input id="formUrl" placeholder="URL do formulário (ex: https://meusite.com/form.html)" value="form.html" />
+  <button id="btn">Gerar QR</button>
+  <div id="qrcode"></div>
+  <a id="baixar" style="display:none" download>Baixar QR</a>
+
+<script>
+document.getElementById('btn').addEventListener('click', () => {
+  const parceiro = document.getElementById('partner').value.trim();
+  const base = document.getElementById('formUrl').value.trim();
+  if (!parceiro || !base) return alert('Preencha parceiro e URL do formulário!');
+  const link = `${base}?parceiro=${encodeURIComponent(parceiro)}`;
+  const qDiv = document.getElementById('qrcode');
+  qDiv.innerHTML = '';
+  new QRCode(qDiv, { text: link, width: 300, height: 300 });
+  setTimeout(() => {
+    const img = qDiv.querySelector('img') || qDiv.querySelector('canvas');
+    const a = document.getElementById('baixar');
+    if (img) {
+      const src = img.tagName === 'IMG' ? img.src : img.toDataURL();
+      a.href = src;
+      a.download = `QR_${parceiro.replace(/\s+/g,'_')}.png`;
+      a.style.display = 'inline-block';
+      a.textContent = 'Baixar QR';
+    }
+  }, 400);
+});
+</script>
+</body>
+</html>
