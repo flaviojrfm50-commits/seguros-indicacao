@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Painel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<h2>Painel</h2>
+
+<h3>Criar Loja</h3>
+<input id="nomeLoja" placeholder="Nome da loja">
+<input id="slugLoja" placeholder="slug">
+<button onclick="criarLoja()">Criar</button>
+
+<hr>
+
+<h3>Produto</h3>
+<input id="nomeProduto" placeholder="Nome">
+<input id="marcaProduto" placeholder="Marca">
+<input id="precoProduto" placeholder="Preço">
+<button onclick="cadastrarProduto()">Cadastrar</button>
+
+<div id="lista"></div>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://bzgvbghxmebdjqnlakbj.supabase.co",
+  "sb_publishable_IyvZNwtgkvECR0QVlYbhzw_zPL1TMJv"
+);
+
+let lojaAtual = null;
+
+async function iniciar(){
+  const { data:{user} } = await supabase.auth.getUser();
+  if(!user){ location.href="index.html"; }
+
+  const { data } = await supabase
+    .from("lojas")
+    .select("*")
+    .eq("usuario_id", user.id)
+    .single();
+
+  if(data){ lojaAtual = data; carregarProdutos(); }
+}
+
+async function criarLoja(){
+  const { data:{user} } = await supabase.auth.getUser();
+
+  const { data } = await supabase
+    .from("lojas")
+    .insert({
+      nome: nomeLoja.value,
+      slug: slugLoja.value,
+      usuario_id: user.id
+    })
+    .select()
+    .single();
+
+  lojaAtual = data;
+  alert("Loja criada!");
+}
+
+async function cadastrarProduto(){
+  await supabase.from("produtos").insert({
+    loja_id: lojaAtual.id,
+    nome: nomeProduto.value,
+    marca: marcaProduto.value,
+    preco: precoProduto.value
+  });
+
+  carregarProdutos();
+}
+
+async function carregarProdutos(){
+  const { data } = await supabase
+    .from("produtos")
+    .select("*")
+    .eq("loja_id", lojaAtual.id);
+
+  lista.innerHTML="";
+  data.forEach(p=>{
+    lista.innerHTML+=`
+      <p>${p.nome} - R$ ${p.preco}</p>
+    `;
+  });
+}
+
+iniciar();
+</script>
+
+</body>
+</html>
