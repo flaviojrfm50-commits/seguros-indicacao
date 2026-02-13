@@ -2,77 +2,72 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Farias iPhones Store</title>
+<title>Login - Multi Lojas</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 body{
   margin:0;
   font-family:Arial;
-  background:#000;
+  background:#0f172a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
   color:#fff;
 }
-.container{
-  max-width:1000px;
-  margin:auto;
-  padding:20px;
-}
-.product{
-  display:flex;
-  flex-wrap:wrap;
-  gap:40px;
-  align-items:center;
-}
-.gallery{flex:1;}
-.main-img{
+
+.card{
+  background:#1e293b;
+  padding:30px;
+  border-radius:10px;
   width:100%;
-  border-radius:12px;
+  max-width:350px;
+  text-align:center;
 }
-.thumbs{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
+
+h2{
+  margin-top:0;
 }
-.thumbs img{
-  width:70px;
-  border-radius:8px;
-  cursor:pointer;
-  opacity:0.7;
-  transition:0.3s;
+
+input{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border:none;
+  border-radius:6px;
 }
-.thumbs img:hover{opacity:1;}
-.info{flex:1;}
+
 button{
-  margin-top:20px;
-  padding:12px 20px;
+  width:100%;
+  padding:10px;
   background:#22c55e;
   border:none;
+  border-radius:6px;
   color:#fff;
   font-size:16px;
-  border-radius:8px;
   cursor:pointer;
+}
+
+a{
+  color:#22c55e;
+  text-decoration:none;
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="product">
-    
-    <div class="gallery">
-      <img id="mainImage" class="main-img">
-      <div class="thumbs" id="thumbs"></div>
-    </div>
+<div class="card">
+  <h2>Login</h2>
 
-    <div class="info">
-      <h2 id="nome"></h2>
-      <p id="descricao"></p>
-      <h3 id="preco"></h3>
-      <button onclick="comprar()">Comprar no WhatsApp</button>
-    </div>
+  <input type="email" id="email" placeholder="Seu email">
+  <input type="password" id="senha" placeholder="Sua senha">
 
-  </div>
+  <button onclick="login()">Entrar</button>
+
+  <p>Não tem conta? <a href="cadastro.html">Cadastrar</a></p>
 </div>
 
 <script>
@@ -81,63 +76,39 @@ const supabase = window.supabase.createClient(
   "sb_publishable_IyvZNwtgkvECR0QVlYbhzw_zPL1TMJv"
 );
 
-let produtoAtual = null;
+// Se já estiver logado, vai direto pro painel
+async function verificarSessao(){
+  const { data:{session} } = await supabase.auth.getSession();
+  if(session){
+    location.href="painel.html";
+  }
+}
 
-async function carregarProduto(){
+async function login(){
 
-  const { data: produto, error } = await supabase
-    .from("produtos")
-    .select("*")
-    .eq("destaque", true)
-    .single();
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+
+  if(!email || !senha){
+    alert("Preencha todos os campos!");
+    return;
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: senha
+  });
 
   if(error){
-    console.error("Erro produto:", error);
+    alert("Email ou senha inválidos!");
+    console.log(error);
     return;
   }
 
-  produtoAtual = produto;
-
-  document.getElementById("nome").innerText = produto.nome;
-  document.getElementById("descricao").innerText = produto.descricao;
-  document.getElementById("preco").innerText = "R$ " + produto.preco;
-
-  const { data: imagens, error: erroImg } = await supabase
-    .from("imagens_produto")
-    .select("*")
-    .eq("produto_id", produto.id);
-
-  if(erroImg){
-    console.error("Erro imagens:", erroImg);
-    return;
-  }
-
-  if(imagens.length > 0){
-    document.getElementById("mainImage").src = imagens[0].url;
-
-    const thumbs = document.getElementById("thumbs");
-    thumbs.innerHTML = "";
-
-    imagens.forEach(img=>{
-      thumbs.innerHTML += `
-        <img src="${img.url}" onclick="trocarImagem('${img.url}')">
-      `;
-    });
-  }
-
+  location.href="painel.html";
 }
 
-function trocarImagem(url){
-  document.getElementById("mainImage").src = url;
-}
-
-function comprar(){
-  window.open(
-    `https://wa.me/55SEUNUMERO?text=Quero comprar ${produtoAtual.nome}`
-  );
-}
-
-carregarProduto();
+verificarSessao();
 </script>
 
 </body>
