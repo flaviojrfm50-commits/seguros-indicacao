@@ -2,30 +2,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Teste Supabase</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>Teste</title>
 </head>
 <body>
 
-<h2>Teste Conexão</h2>
+<h2>Teste JS</h2>
 
-<button onclick="teste()">Testar Conexão</button>
+<button onclick="teste()">Clique aqui</button>
 
 <script>
-const supabase = window.supabase.createClient(
-  "https://bzgvbghxmebdjqnlakbj.supabase.co",
-  "sb_publishable_IyvZNwtgkvECR0QVlYbhzw_zPL1TMJv"
-);
-
-async function teste(){
-  alert("Iniciando teste...");
-
-  const { data, error } = await supabase.auth.getSession();
-
-  alert("Resposta recebida!");
-
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
+function teste(){
+  alert("JS está funcionando!");
 }
 </script>
 
