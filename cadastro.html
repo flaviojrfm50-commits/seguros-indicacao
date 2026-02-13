@@ -21,8 +21,8 @@ const supabase = window.supabase.createClient(
 
 async function cadastrar(){
   const { error } = await supabase.auth.signUp({
-    email: email.value,
-    password: senha.value
+    email: document.getElementById("email").value,
+    password: document.getElementById("senha").value
   });
 
   if(error){
