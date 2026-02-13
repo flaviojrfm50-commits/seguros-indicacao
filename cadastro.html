@@ -1,17 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Teste Auth</title>
+<title>Cadastro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.card{
+  background:#1e293b;
+  padding:30px;
+  border-radius:10px;
+  width:100%;
+  max-width:350px;
+}
+input{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border:none;
+  border-radius:6px;
+}
+button{
+  width:100%;
+  padding:10px;
+  background:#22c55e;
+  border:none;
+  border-radius:6px;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+#msg{
+  margin-top:10px;
+  font-size:14px;
+}
+</style>
 </head>
 <body>
 
-<h2>Teste Cadastro Real</h2>
+<div class="card">
+  <h2>Criar Conta</h2>
 
-<button onclick="teste()">Criar conta teste</button>
+  <input type="email" id="email" placeholder="Seu email">
+  <input type="password" id="senha" placeholder="Sua senha">
 
-<div id="resultado"></div>
+  <button onclick="cadastrar()">Cadastrar</button>
+
+  <div id="msg"></div>
+
+  <p style="margin-top:10px;">
+    Já tem conta? <a href="index.html" style="color:#22c55e;">Entrar</a>
+  </p>
+</div>
 
 <script>
 const supabase = window.supabase.createClient(
@@ -19,28 +69,37 @@ const supabase = window.supabase.createClient(
   "sb_publishable_IyvZNwtgkvECR0QVlYbhzw_zPL1TMJv"
 );
 
-async function teste(){
+async function cadastrar(){
 
-  document.getElementById("resultado").innerText = "Enviando...";
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+  const msg = document.getElementById("msg");
 
-  try {
+  msg.innerText = "Enviando...";
+  msg.style.color = "white";
 
-    const { data, error } = await supabase.auth.signUp({
-      email: "teste" + Date.now() + "@gmail.com",
-      password: "12345678"
-    });
-
-    if(error){
-      document.getElementById("resultado").innerText = "ERRO: " + error.message;
-      return;
-    }
-
-    document.getElementById("resultado").innerText = "SUCESSO!";
-
-  } catch(e){
-    document.getElementById("resultado").innerText = "ERRO GERAL: " + e.message;
+  if(!email || !senha){
+    msg.innerText = "Preencha todos os campos.";
+    msg.style.color = "orange";
+    return;
   }
 
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: senha
+  });
+
+  console.log("DATA:", data);
+  console.log("ERROR:", error);
+
+  if(error){
+    msg.innerText = "Erro: " + error.message;
+    msg.style.color = "red";
+    return;
+  }
+
+  msg.innerText = "Conta criada com sucesso!";
+  msg.style.color = "#22c55e";
 }
 </script>
 
