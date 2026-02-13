@@ -2,22 +2,43 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Teste Supabase</title>
+<title>Teste Auth</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<h2>Teste Biblioteca</h2>
+<h2>Teste Cadastro Real</h2>
 
-<button onclick="teste()">Testar</button>
+<button onclick="teste()">Criar conta teste</button>
+
+<div id="resultado"></div>
 
 <script>
-function teste(){
+const supabase = window.supabase.createClient(
+  "https://bzgvbghxmebdjqnlakbj.supabase.co",
+  "sb_publishable_IyvZNwtgkvECR0QVlYbhzw_zPL1TMJv"
+);
 
-  if(window.supabase){
-    alert("Biblioteca carregada!");
-  }else{
-    alert("Biblioteca NÃO carregou!");
+async function teste(){
+
+  document.getElementById("resultado").innerText = "Enviando...";
+
+  try {
+
+    const { data, error } = await supabase.auth.signUp({
+      email: "teste" + Date.now() + "@gmail.com",
+      password: "12345678"
+    });
+
+    if(error){
+      document.getElementById("resultado").innerText = "ERRO: " + error.message;
+      return;
+    }
+
+    document.getElementById("resultado").innerText = "SUCESSO!";
+
+  } catch(e){
+    document.getElementById("resultado").innerText = "ERRO GERAL: " + e.message;
   }
 
 }
