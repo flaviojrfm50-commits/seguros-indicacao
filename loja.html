@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Vitrine da Loja</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:#fff;
+}
+
+header{
+  text-align:center;
+  padding:30px;
+  background:#000;
+}
+
+h1{
+  margin:0;
+}
+
+.container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  padding:20px;
+}
+
+.card{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:scale(1.03);
+}
+
+button{
+  margin-top:10px;
+  padding:8px 15px;
+  background:#22c55e;
+  border:none;
+  border-radius:6px;
+  color:#fff;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="nomeLoja">Carregando...</h1>
+</header>
+
+<div class="container" id="produtos"></div>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://bzgvbghxmebdjqnlakbj.supabase.co",
+  "sb_publishable_IyvZNwtgkvECR0QVlYbhzw_zPL1TMJv"
+);
+
+const params = new URLSearchParams(window.location.search);
+const slug = params.get("slug");
+
+if(!slug){
+  document.body.innerHTML="<h2>Loja não encontrada</h2>";
+}
+
+async function carregarLoja(){
+
+  const { data: loja, error } = await supabase
+    .from("lojas")
+    .select("*")
+    .eq("slug", slug)
+    .single();
+
+  if(error || !loja){
+    document.body.innerHTML="<h2>Loja não encontrada</h2>";
+    return;
+  }
+
+  document.getElementById("nomeLoja").innerText = loja.nome;
+
+  const { data: produtos } = await supabase
+    .from("produtos")
+    .select("*")
+    .eq("loja_id", loja.id);
+
+  const container = document.getElementById("produtos");
+  container.innerHTML="";
+
+  if(produtos.length === 0){
+    container.innerHTML="<p>Esta loja ainda não cadastrou produtos.</p>";
+    return;
+  }
+
+  produtos.forEach(p=>{
+    container.innerHTML += `
+      <div class="card">
+        <h3>${p.nome}</h3>
+        <p>Marca: ${p.marca}</p>
+        <p><strong>R$ ${p.preco}</strong></p>
+        <button onclick="comprar('${p.nome}')">
+          Comprar no WhatsApp
+        </button>
+      </div>
+    `;
+  });
+
+}
+
+function comprar(nome){
+  window.open(
+    `https://wa.me/55SEUNUMERO?text=Olá, quero comprar ${nome}`
+  );
+}
+
+carregarLoja();
+</script>
+
+</body>
+</html>
