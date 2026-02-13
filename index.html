@@ -1,74 +1,19 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Login - Multi Lojas</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>Login</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0f172a;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  color:#fff;
-}
-
-.card{
-  background:#1e293b;
-  padding:30px;
-  border-radius:10px;
-  width:100%;
-  max-width:350px;
-  text-align:center;
-}
-
-h2{
-  margin-top:0;
-}
-
-input{
-  width:100%;
-  padding:10px;
-  margin:8px 0;
-  border:none;
-  border-radius:6px;
-}
-
-button{
-  width:100%;
-  padding:10px;
-  background:#22c55e;
-  border:none;
-  border-radius:6px;
-  color:#fff;
-  font-size:16px;
-  cursor:pointer;
-}
-
-a{
-  color:#22c55e;
-  text-decoration:none;
-}
-</style>
 </head>
 <body>
 
-<div class="card">
-  <h2>Login</h2>
+<h2>Login</h2>
 
-  <input type="email" id="email" placeholder="Seu email">
-  <input type="password" id="senha" placeholder="Sua senha">
+<input id="email" placeholder="email">
+<input id="senha" type="password" placeholder="senha">
+<button onclick="login()">Entrar</button>
 
-  <button onclick="login()">Entrar</button>
-
-  <p>Não tem conta? <a href="cadastro.html">Cadastrar</a></p>
-</div>
+<p><a href="cadastro.html">Criar conta</a></p>
 
 <script>
 const supabase = window.supabase.createClient(
@@ -76,39 +21,20 @@ const supabase = window.supabase.createClient(
   "sb_publishable_IyvZNwtgkvECR0QVlYbhzw_zPL1TMJv"
 );
 
-// Se já estiver logado, vai direto pro painel
-async function verificarSessao(){
-  const { data:{session} } = await supabase.auth.getSession();
-  if(session){
-    location.href="painel.html";
-  }
-}
-
 async function login(){
-
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
-
-  if(!email || !senha){
-    alert("Preencha todos os campos!");
-    return;
-  }
-
   const { error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: senha
+    email: email.value,
+    password: senha.value
   });
 
   if(error){
-    alert("Email ou senha inválidos!");
+    alert("Erro ao logar");
     console.log(error);
     return;
   }
 
   location.href="painel.html";
 }
-
-verificarSessao();
 </script>
 
 </body>
