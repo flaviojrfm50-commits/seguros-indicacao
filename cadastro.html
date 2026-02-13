@@ -1,65 +1,17 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Cadastro - Multi Lojas</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0f172a;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  color:#fff;
-}
-.card{
-  background:#1e293b;
-  padding:30px;
-  border-radius:10px;
-  width:100%;
-  max-width:350px;
-  text-align:center;
-}
-input{
-  width:100%;
-  padding:10px;
-  margin:8px 0;
-  border:none;
-  border-radius:6px;
-}
-button{
-  width:100%;
-  padding:10px;
-  background:#22c55e;
-  border:none;
-  border-radius:6px;
-  color:#fff;
-  font-size:16px;
-  cursor:pointer;
-}
-a{
-  color:#22c55e;
-  text-decoration:none;
-}
-</style>
 </head>
 <body>
 
-<div class="card">
-  <h2>Criar Conta</h2>
+<h2>Criar conta</h2>
 
-  <input type="email" id="email" placeholder="Seu email">
-  <input type="password" id="senha" placeholder="Sua senha">
-
-  <button onclick="cadastrar()">Cadastrar</button>
-
-  <p>Já tem conta? <a href="index.html">Entrar</a></p>
-</div>
+<input id="email" placeholder="email">
+<input id="senha" type="password" placeholder="senha">
+<button onclick="cadastrar()">Cadastrar</button>
 
 <script>
 const supabase = window.supabase.createClient(
@@ -68,27 +20,18 @@ const supabase = window.supabase.createClient(
 );
 
 async function cadastrar(){
-
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
-
-  if(!email || !senha){
-    alert("Preencha todos os campos!");
-    return;
-  }
-
-  const { data, error } = await supabase.auth.signUp({
-    email: email,
-    password: senha
+  const { error } = await supabase.auth.signUp({
+    email: email.value,
+    password: senha.value
   });
 
   if(error){
-    alert("Erro ao criar conta!");
+    alert("Erro ao cadastrar");
     console.log(error);
     return;
   }
 
-  alert("Conta criada! Faça login.");
+  alert("Conta criada!");
   location.href="index.html";
 }
 </script>
