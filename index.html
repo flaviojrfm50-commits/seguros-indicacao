@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Farias iPhones Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:#fff;
+}
+header{
+  text-align:center;
+  padding:30px;
+  background:linear-gradient(90deg,#111,#000);
+}
+h1{margin:0;font-size:28px}
+.container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  padding:20px;
+}
+.card{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
+}
+.card img{
+  width:100%;
+  border-radius:10px;
+}
+button{
+  margin-top:10px;
+  padding:10px;
+  background:#22c55e;
+  border:none;
+  color:#fff;
+  cursor:pointer;
+  border-radius:6px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔥 Farias iPhones Store</h1>
+  <p>iPhones Originais com Garantia</p>
+</header>
+
+<div class="container" id="produtos"></div>
+
+<script>
+const supabase = window.supabase.createClient(
+  "SUA_URL",
+  "SUA_ANON_KEY"
+);
+
+async function carregarProdutos(){
+  const { data } = await supabase.from("produtos").select("*");
+
+  const container = document.getElementById("produtos");
+  container.innerHTML="";
+
+  data.forEach(prod=>{
+    container.innerHTML += `
+      <div class="card">
+        <img src="${prod.imagem}">
+        <h3>${prod.nome}</h3>
+        <p>R$ ${prod.preco}</p>
+        <button onclick="comprar('${prod.nome}')">Comprar</button>
+      </div>
+    `;
+  });
+}
+
+function comprar(nome){
+  window.open(`https://wa.me/55SEUNUMERO?text=Quero comprar ${nome}`);
+}
+
+carregarProdutos();
+</script>
+
+</body>
+</html>
