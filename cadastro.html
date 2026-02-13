@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Painel - Multi Lojas</title>
+<title>Cadastro - Multi Lojas</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -11,61 +11,54 @@ body{
   margin:0;
   font-family:Arial;
   background:#0f172a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
   color:#fff;
-  padding:20px;
 }
-h2,h3{margin-top:0}
-input{
-  padding:8px;
-  margin:5px 0;
-  width:100%;
-  max-width:300px;
-  border-radius:6px;
-  border:none;
-}
-button{
-  padding:8px 15px;
-  margin:5px 0;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-}
-.primary{background:#22c55e;color:#fff;}
-.logout{background:#ef4444;color:#fff;}
 .card{
   background:#1e293b;
-  padding:15px;
-  margin-top:10px;
-  border-radius:8px;
+  padding:30px;
+  border-radius:10px;
+  width:100%;
+  max-width:350px;
+  text-align:center;
+}
+input{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border:none;
+  border-radius:6px;
+}
+button{
+  width:100%;
+  padding:10px;
+  background:#22c55e;
+  border:none;
+  border-radius:6px;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+a{
+  color:#22c55e;
+  text-decoration:none;
 }
 </style>
 </head>
 <body>
 
-<h2>Painel do Lojista</h2>
-<button class="logout" onclick="logout()">Sair</button>
+<div class="card">
+  <h2>Criar Conta</h2>
 
-<hr>
+  <input type="email" id="email" placeholder="Seu email">
+  <input type="password" id="senha" placeholder="Sua senha">
 
-<div id="areaLoja">
-  <h3>Criar Loja</h3>
-  <input id="nomeLoja" placeholder="Nome da loja">
-  <input id="slugLoja" placeholder="Slug (ex: farias)">
-  <button class="primary" onclick="criarLoja()">Criar Loja</button>
-</div>
+  <button onclick="cadastrar()">Cadastrar</button>
 
-<hr>
-
-<div id="areaProdutos" style="display:none;">
-  <h3>Cadastrar Produto</h3>
-  <input id="nomeProduto" placeholder="Nome do produto">
-  <input id="marcaProduto" placeholder="Marca">
-  <input id="precoProduto" placeholder="Preço">
-  <input id="estoqueProduto" placeholder="Estoque">
-  <button class="primary" onclick="cadastrarProduto()">Cadastrar</button>
-
-  <h3>Meus Produtos</h3>
-  <div id="listaProdutos"></div>
+  <p>Já tem conta? <a href="index.html">Entrar</a></p>
 </div>
 
 <script>
@@ -74,121 +67,30 @@ const supabase = window.supabase.createClient(
   "sb_publishable_IyvZNwtgkvECR0QVlYbhzw_zPL1TMJv"
 );
 
-let lojaAtual = null;
-let usuarioAtual = null;
+async function cadastrar(){
 
-async function iniciar(){
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
 
-  const { data:{user} } = await supabase.auth.getUser();
-
-  if(!user){
-    location.href="index.html";
+  if(!email || !senha){
+    alert("Preencha todos os campos!");
     return;
   }
 
-  usuarioAtual = user;
-
-  const { data: loja } = await supabase
-    .from("lojas")
-    .select("*")
-    .eq("usuario_id", user.id)
-    .single();
-
-  if(loja){
-    lojaAtual = loja;
-    document.getElementById("areaLoja").style.display="none";
-    document.getElementById("areaProdutos").style.display="block";
-    carregarProdutos();
-  }
-}
-
-async function criarLoja(){
-
-  if(!nomeLoja.value || !slugLoja.value){
-    alert("Preencha os campos!");
-    return;
-  }
-
-  const { data, error } = await supabase
-    .from("lojas")
-    .insert({
-      nome: nomeLoja.value,
-      slug: slugLoja.value,
-      usuario_id: usuarioAtual.id
-    })
-    .select()
-    .single();
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: senha
+  });
 
   if(error){
-    alert("Erro ao criar loja");
+    alert("Erro ao criar conta!");
     console.log(error);
     return;
   }
 
-  lojaAtual = data;
-  alert("Loja criada com sucesso!");
-
-  document.getElementById("areaLoja").style.display="none";
-  document.getElementById("areaProdutos").style.display="block";
-}
-
-async function cadastrarProduto(){
-
-  if(!lojaAtual){
-    alert("Crie uma loja primeiro");
-    return;
-  }
-
-  const { error } = await supabase.from("produtos").insert({
-    loja_id: lojaAtual.id,
-    nome: nomeProduto.value,
-    marca: marcaProduto.value,
-    preco: precoProduto.value,
-    estoque: estoqueProduto.value
-  });
-
-  if(error){
-    alert("Erro ao cadastrar produto");
-    console.log(error);
-    return;
-  }
-
-  nomeProduto.value="";
-  marcaProduto.value="";
-  precoProduto.value="";
-  estoqueProduto.value="";
-
-  carregarProdutos();
-}
-
-async function carregarProdutos(){
-
-  const { data } = await supabase
-    .from("produtos")
-    .select("*")
-    .eq("loja_id", lojaAtual.id);
-
-  const lista = document.getElementById("listaProdutos");
-  lista.innerHTML="";
-
-  data.forEach(p=>{
-    lista.innerHTML += `
-      <div class="card">
-        <strong>${p.nome}</strong><br>
-        Marca: ${p.marca}<br>
-        Preço: R$ ${p.preco}<br>
-        Estoque: ${p.estoque}
-      </div>
-    `;
-  });
-}
-
-async function logout(){
-  await supabase.auth.signOut();
+  alert("Conta criada! Faça login.");
   location.href="index.html";
 }
-
-iniciar();
 </script>
 
 </body>
