@@ -2,17 +2,24 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Teste</title>
+<title>Teste Supabase</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<h2>Teste JS</h2>
+<h2>Teste Biblioteca</h2>
 
-<button onclick="teste()">Clique aqui</button>
+<button onclick="teste()">Testar</button>
 
 <script>
 function teste(){
-  alert("JS está funcionando!");
+
+  if(window.supabase){
+    alert("Biblioteca carregada!");
+  }else{
+    alert("Biblioteca NÃO carregou!");
+  }
+
 }
 </script>
 
